@@ -35,6 +35,7 @@
 !     Primary flow variables in the mesh
       allocate(g%ro(ni,nj),g%rovx(ni,nj),g%rovy(ni,nj),g%roe(ni,nj))
 
+      allocate(g%corr_ro(ni, nj), g%corr_roe(ni, nj), g%corr_rovx(ni, nj), g%corr_rovy(ni, nj))
 !     Cell centred primary increments
       allocate(g%dro(ni-1,nj-1),g%drovx(ni-1,nj-1), &
           g%drovy(ni-1,nj-1),g%droe(ni-1,nj-1))

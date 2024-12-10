@@ -22,7 +22,8 @@
       type(t_geometry) :: geom
       type(t_grid) :: g
       real :: d_max = 1, d_avg = 1
-      integer :: nstep, nconv = 5, ncheck = 5
+      integer :: nstep, nconv = 5, ncheck = 5, i, j
+      integer :: nrkut, nrkuts
 
 !     Read in the data on the run settings
       call read_settings(av,bcs)
@@ -68,6 +69,7 @@
 !            solution will be reduced. You will need to complete this option.
       call flow_guess(av,g,bcs,2)
 
+
 !     Optional output call to inspect the initial guess of the flowfield
       call write_output(av,g,2)
 
@@ -85,22 +87,47 @@
       open(unit=11,file='stopit')
       write(11,*) 0; close(11);
 
+
+      g%corr_ro = 0.0
+      g%corr_roe = 0.0
+      g%corr_rovx = 0.0
+      g%corr_rovy = 0.0
 !     Start the time stepping do loop for "nsteps". This is now the heart of the
 !     program, you should aim to program anything inside this loop to operate as
 !     efficiently as you can.
-      do nstep = 1, av%nsteps
+      ! Runge-Kutta
+      nrkuts = 2
 
-!         Update record of nstep to use in subroutines
-          av%nstep = nstep
+            do nstep = 1, av%nsteps
+
+                 !Update record of nstep to use in subroutines
+                 av%nstep = nstep
+
+            !     Runge-Kutta
+                 g%ro_start = g%ro
+                 g%roe_start = g%roe
+                 g%rovx_start = g%rovx
+                 g%rovy_start = g%rovy
+                 do nrkut = 1, nrkuts
+                     av%dt = av%dt_total / (1 + nrkuts - nrkut)
+                     call set_secondary(av,g)
+                     call apply_bconds(av,g,bcs)
+                     call euler_iteration(av,g)
+                 end do
+       
 
 !         Calculate secondary flow variables used in conservation equations
-          call set_secondary(av,g)
+          ! Pre Runge-Kutta
+          !call set_secondary(av,g)
 
 !         Apply inlet and outlet values at the boundaries of the domain
-          call apply_bconds(av,g,bcs)
+          ! Pre Runge-Kutta
+          !call apply_bconds(av,g,bcs)
 
 !         Perform the timestep to update the primary flow variables
-          call euler_iteration(av,g)
+          ! Pre Runge-Kutta
+          !call euler_iteration(av,g)
+
 
 !         Write out summary every "nconv" steps and update "davg" and "dmax" 
           if(mod(av%nstep,nconv) == 0) then
@@ -115,8 +142,8 @@
 
 !         Stop marching if converged to the desired tolerance "conlim"
           if(d_max < av%d_max .and. d_avg < av%d_avg) then
-              write(6,*) 'Calculation converged in', nstep,'iterations'
-              exit
+                  write(6,*) 'Calculation converged in', nstep,'iterations'
+                  exit
           end if
 
       end do

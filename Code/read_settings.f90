@@ -22,6 +22,10 @@
 !         nsteps
 !         ni, nj
 !     INSERT
+      read(5,*) av%gam, av%rgas		! Gas constant and specific heat ratio
+      read(5,*) av%cfl, av%sfac		! CFL number and smoothing factor
+      read(5,*) av%nsteps		! Maximum number of timestops
+      read(5,*) av%ni, av%nj		! Number of grid nodes in x and y directions
 
 !     Calculate other gas constants used throughout the calculation
       av%cp = av%rgas * av%gam / (av%gam - 1.0)
@@ -40,20 +44,23 @@
 !     Read the inlet boundary condition data and store into the "bcs" datatype
 !         pstag, tstag, alpha, rfin
 !     INSERT
+      read(5,*) bcs%pstag, bcs%tstag, bcs%alpha, bcs%rfin
 
 !     Convert the inlet angle to radians
       bcs%alpha = bcs%alpha * 3.14159 / 180.0
 
 !     Calculate the inlet stagnation density "rostag"
 !     INSERT
+      bcs%rostag = bcs%pstag / (av%rgas * bcs%tstag)
 
 !     Read the outlet static pressure and store into the "bcs" datatype
 !     INSERT
+      read(5,*) bcs%p_out
 
 !     Print the settings to check they have been read, you can use this syntax
 !     anywhere else you want in the program to debug your code
       write(6,*)
-      write(6,*) 'Solver begins on ', av%casename, ' case'
+      write(6,*) 'Read Settings: Solver begins on ', av%casename, ' case'
       write(6,*)
       write(6,*) 'Read application variables from file'
       write(6,*) '  rgas =', av%rgas, 'cp =', av%cp, 'cv =', av%cv

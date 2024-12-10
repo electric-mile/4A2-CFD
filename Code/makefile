@@ -16,7 +16,8 @@ FC = gfortran
 # Option of Compilation
 
 # Debug option
-FFLAGS = -fcheck=all -g
+#FFLAGS = -fcheck=all -g
+FFLAGS = -g
 
 # Select the optimising option by deleting # in the following line
 #FFLAGS = -O2

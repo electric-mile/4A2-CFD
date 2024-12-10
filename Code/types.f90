@@ -14,7 +14,7 @@
           real :: rgas, gam, cp, cv, fgam
 
 !         Timestepping, smoothing and other run options
-          real ::  cfl, sfac, dt, d_max, d_avg
+          real ::  cfl, sfac, dt, d_max, d_avg, dt_total
           integer :: nsteps, nstep
 
 !         Reference values of the primary flow variables
@@ -78,8 +78,11 @@
               lx_j, ly_j
           real  ::  l_min
 
+          real, allocatable :: corr_ro(:,:), corr_roe(:,:), corr_rovx(:,:), corr_rovy(:,:)
+      
 !         Primary variables at nodes
           real, dimension(:,:), allocatable :: ro, roe, rovx, rovy
+          real, dimension(:,:), allocatable :: ro_start, roe_start, rovx_start, rovy_start
 
 !         Variables to hold cell increments
           real, dimension(:,:), allocatable :: dro, droe, drovx, drovy

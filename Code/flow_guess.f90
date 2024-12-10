@@ -13,16 +13,18 @@
       type(t_bconds), intent(in) :: bcs
       integer, intent(in) :: guesstype
       integer :: i, j, ni, nj, j_mid
-      
-!     Variables required for the crude guess
+
+      ! Variables required for the crude guess
       real :: t_out, v_out, ro_out, lx, ly, l
 
-!     Variables required for the improved guess, you will need to add to these
-      real :: l_i(g%ni)
-!     INSERT
+      ! Variables required for the improved guess
+      real :: l_i(g%ni), v_guess(g%ni), ro_guess(g%ni)
+      real :: t_static(g%ni), t_lim, mach, p_static(g%ni), t_guess(g%ni), mach_guess(g%ni)
+      real :: l_tot, m_f_r, a_vel, mach_lim
 
 !     Get the size of the mesh and store locally for convenience
-      ni = g%ni; nj = g%nj;
+      ni = g%ni
+      nj = g%nj
 
 !     Assuming isentropic flow to the the exit plane calculate the static
 !     temperature and the exit velocity
@@ -34,28 +36,28 @@
       if(guesstype == 1) then
 
 !         Store the exit density and internal energy as if they were uniform 
-          g%ro = ro_out 
-          g%roe  = g%ro * (av%cv * t_out + 0.5 * v_out**2)
+            g%ro = ro_out 
+            g%roe  = g%ro * (av%cv * t_out + 0.5 * v_out**2)
 
 !         Calculate the gradient of the mesh lines in the centre of the domain
 !         to determine the assumed direction of the flow
-          j_mid = nj / 2
-          do i = 1,ni-1
-              lx = g%lx_j(i,j_mid); ly = g%ly_j(i,j_mid); 
-              l = hypot(lx,ly)
-              g%rovx(i,:) = g%ro(i,:) * v_out * ly / l
-              g%rovy(i,:) = -g%ro(i,:) * v_out * lx / l
-          end do
+            j_mid = nj / 2
+            do i = 1,ni-1
+                  lx = g%lx_j(i,j_mid); ly = g%ly_j(i,j_mid); 
+                  l = hypot(lx,ly)
+                  g%rovx(i,:) = g%ro(i,:) * v_out * ly / l
+                  g%rovy(i,:) = -g%ro(i,:) * v_out * lx / l
+            end do
 
 !         Copy the values to the "i = ni" nodes as an approximation
-          g%rovx(ni,:) = g%rovx(ni-1,:)
-          g%rovy(ni,:) = g%rovy(ni-1,:)
+            g%rovx(ni,:) = g%rovx(ni-1,:)
+            g%rovy(ni,:) = g%rovy(ni-1,:)
 
 !         Print the guess that has been calculated
-          write(6,*) 'Crude flow guess calculated'
-          write(6,*) '  At first point ro =', g%ro(1,1), 'roe =', &
-              g%roe(1,1), 'rovx =', g%rovx(1,1), 'rovy =', g%rovy(1,1)
-          write(6,*)
+            write(6,*) 'Flow Guess: Crude flow guess calculated'
+            write(6,*) '  At first point ro =', g%ro(1,1), 'roe =', &
+                  g%roe(1,1), 'rovx =', g%rovx(1,1), 'rovy =', g%rovy(1,1)
+            write(6,*)
 
       else if(guesstype == 2) then 
 
@@ -66,14 +68,19 @@
 !         second dimension with "sum". 
 !         INSERT
 
+            l_i = sum(hypot(g%lx_i, g%ly_i), 2)
+		
 !         Use the exit temperature, density and velocity calculated for the 
 !         crude guess with "l_i" to estimate the mass flow rate at the exit
 !         INSERT
+            m_f_r = ro_out * v_out * l_i(ni)
 
 !         Set a limit to the maximum allowable mach number in the initial
 !         guess, call this "mach_lim", calculate the corresponding temperature,
 !         called "t_lim"
 !         INSERT
+            mach_lim = 1.00
+            t_lim = bcs%tstag / (1.0 + (av%gam - 1.0)/2.0 * (mach_lim**2.0))
 
 !         Now estimate the velocity and density at every "i = const" line, call 
 !         the velocity "v_guess(i)" and the density "ro_guess(i)":
@@ -84,20 +91,65 @@
 !             5. Calculate the density throughout "ro_guess(i)"
 !             6. Update the estimate of the velocity "v_guess(i)" 
 !         INSERT
+            !Pre-extension
+            !v_guess = m_f_r/(ro_out*l_i)
 
+            ! Extension
+            v_guess = v_out
+            t_static = max(t_lim, bcs%tstag - (v_guess**2)/(2.0*av%cp))
+            ! Pre-extension
+            !ro_guess = (bcs%pstag * (t_static/bcs%tstag) ** (1.0/av%fgam))/(av%rgas * t_static)
+            
+            ! Extension
+            ro_guess = ro_out
+
+            ! Pre-extension
+            !v_guess = m_f_r/(ro_guess*l_i)
+	
 !         Direct the calculated velocity to be parallel to the "j = const"
 !         gridlines for all values of i and j. This can be achieved with a 
 !         similar calculation to the "j = nj/2" one that was performed in the 
 !         crude guess. Then set all of ro, roe, rovx and rovy, note that roe 
 !         includes the kinetic energy component of the internal energy.
 !         INSERT 
-              
+            do i = 1, ni-1
+                  !Test Code
+            	!g%ro(i,:) = ro_guess(i)
+            	!g%roe(i,:) = ro_guess(i) * (av%cv*t_static(i) + 0.5*v_guess(i)**2)
+                  !End Test
+                  do j = 1, nj
+                        lx = g%lx_j(i,j)
+                        ly = g%ly_j(i,j)
+                        l = hypot(lx,ly)
+                        g%ro(i, j) = ro_guess(i)
+                        g%rovx(i,j) = g%ro(i, j) * v_guess(i) * ly / l
+                        g%rovy(i,j) = -g%ro(i, j) * v_guess(i) * lx / l
+
+                        !!! MY ROE GUESS PLOT VALUES SEEM QUITE HIGH!!!
+
+			      g%roe(i, j) = g%ro(i,j)*(0.50*(v_guess(i)**2.0) + (av%cv * t_static(i)))
+                        if (g%ro(i,j) <0.0) then
+                              write(6,*) 'Negative density at position (', i, ',', j, '): ro =', g%ro(i,j)
+                              stop
+                        end if
+                  end do
+            end do
 !         Make sure the guess has been copied for the "i = ni" values too
 !         INSERT
+            do j = 1, nj
+                  g%rovx(ni, j) = g%rovx(ni-1,j)
+                  g%rovy(ni, j) = g%rovy(ni-1,j)
+                  g%roe (ni, j) = g%roe (ni-1,j)
+                  g%ro (ni, j) = g%ro (ni-1,j)
+            end do
+
 
 !         Print the first elements of the guess like for the crude guess
 !         INSERT
-
+            write(6,*) 'Flow Guess: Improved flow guess calculated'
+            write(6,*) '  At first point ro =', g%ro(1,1), 'roe =', &
+                g%roe(1,1), 'rovx =', g%rovx(1,1), 'rovy =', g%rovy(1,1)
+            write(6,*)
       end if
 
 !     The initial guess values derived from the boundary conditions are also

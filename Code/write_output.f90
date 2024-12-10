@@ -62,7 +62,6 @@
           write(7) g%drovx; write(7) g%drovy;           
 
       end if
-
 !     Close the unit
       close(7)
 

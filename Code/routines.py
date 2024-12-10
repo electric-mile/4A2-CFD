@@ -6,6 +6,7 @@
 
 # Import modules and functions
 import sys
+import os
 import numpy as np
 import matplotlib.pyplot as plt 
 import scipy.interpolate as interp
@@ -21,7 +22,20 @@ def calc_secondary(av,b):
     # your post-processing, save them into the block "b" dictionary alongside
     # mesh coordinates and primary flow variables.
     # INSERT
-
+    b['vy'] = b['rovy'] / b['ro']
+    b['vx'] = b['rovx'] / b['ro'] 
+    b['v'] = (b['vx']**2 + b['vy']**2)**0.5
+    b['t'] = (b['roe'] - 0.5 * b['ro'] * (b['v']**2)) / (b['ro'] * av['cv'])
+    b['p'] = b['ro'] * b['t'] * av['rgas']
+    b['hstag'] = b['roe'] + (b['p'] / b['ro'])
+    #b['tstag'] = (0.5 * (b['v']**2) + b['t']) / av['cv']
+    b['alpha'] = np.arctan(b['vy'] / b['vx'])
+    b['pstag'] = (b['p'] + 0.5 * b['ro'] * b['v']**2)
+    b['mach'] = b['v'] / ((av['gam'] * av['rgas'] * b['t'])**0.5)
+    b['tstag'] = (b['t'] * (1+((av['gam']-1)/2)*b['mach']**2))
+    b['tstag_ratio'] = b['tstag'] / b['tstag'][0,:]
+    
+    
     return b
 
 ################################################################################
@@ -593,7 +607,16 @@ def read_case(filename):
 
     # Initialise the dictionary to store the data
     g = {}
+    print("Current working directory:", os.getcwd())
 
+    # Print the full path of the file
+    full_path = os.path.abspath(filename)
+    print("Full path of the file:", full_path)
+
+    # Check if the file exists
+    if not os.path.isfile(full_path):
+        print(f"Error: The file '{filename}' does not exist.")
+        return None
     # Open the file to read
     f = open(filename,'r')
 

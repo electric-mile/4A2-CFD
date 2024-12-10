@@ -16,6 +16,7 @@ def main():
 
     # Read the case from file
     g = read_case(filename)
+    
 
     # Open figure window and set the axes to be equal
     plt.figure(figsize=[9.6,7.2]); ax = plt.axes(); cols = gen_cols();

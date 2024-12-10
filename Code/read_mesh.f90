@@ -53,7 +53,7 @@
 
 !     Read which blocks the inlet and outlets are on
       read(2) bcs%n_in, bcs%n_out
-      write(6,*) '  Inlet on block', bcs%n_in, 'outlet on block', bcs%n_out
+      write(6,*) 'Read Mesh:  Inlet on block', bcs%n_in, 'outlet on block', bcs%n_out
 
 !     Allocate arrays to store static conditions at the inlet plane now we know
 !     which block the inlet plane is on and its size in the j-direction
@@ -61,14 +61,14 @@
 
 !     Read the number of matching patches
       read(2) av%nm; allocate(p(av%nm));
-      write(6,*) '  Number of matching patches nm =', av%nm
+      write(6,*) 'Read Mesh:  Number of matching patches nm =', av%nm
 
 !     Loop over all matching patches and read the indices
       do m = 1,av%nm 
 
 !         Read the length of the patch and the block indices
           read(2) p(m)%nk, p(m)%n_1, p(m)%n_2 
-          write(6,*) '  Size of patch', m, 'nk =', p(m)%nk, 'joins block', &
+          write(6,*) 'Read Mesh:  Size of patch', m, 'nk =', p(m)%nk, 'joins block', &
               p(m)%n_1, 'and', p(m)%n_2
 
 !         Allocate the length of the index lists

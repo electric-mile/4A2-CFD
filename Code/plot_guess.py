@@ -13,6 +13,7 @@ def main():
 
     # Construct full filenames to read the guess data
     filename = 'out_guess_' + sys.argv[-1] + '.bin'
+    print(filename)
 
     # Read the case from file
     g = read_case(filename)
