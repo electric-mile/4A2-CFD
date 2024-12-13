@@ -49,10 +49,14 @@
 !     Calculate "p(1,:)", "rovx(1,:)", "rovy(1,:)" and "roe(1,:)" from the inlet 
 !     "ro(:)", "pstag", "tstag" and "alpha". Also set "vx(1,:)", "vy(1,:)" and 
 !     "hstag(1,:)"
-      !t_in(:) = bcs%tstag*(bcs%ro/(bcs%pstag/(av%rgas*bcs%tstag)))**(av%gam-1.0)
-      t_in(:) = bcs%tstag*(bcs%ro/bcs%rostag)**(av%gam-1.0)
       
+      t_in(:) = bcs%tstag*(bcs%ro/bcs%rostag)**(av%gam-1.0)
       g%p(1,:) = bcs%ro * t_in(:) * av%rgas
+
+      if (av%casename == 'waves') then
+          g%p(1,:) = bcs%p_out
+      end if
+
       v_in(:) = sqrt(2*av%cp*(bcs%tstag-t_in(:)))
 
       g%vx(1,:) = v_in(:)*cos(bcs%alpha)
@@ -62,6 +66,8 @@
       g%rovy(1,:) = bcs%ro * g%vy(1,:)
 
       g%roe(1,:) = bcs%ro * (av%cv * t_in(:) + 0.5 * v_in(:)**2)
+
+      ! g%hstag(1,:) = av%cp*t_in(:) + (v_in(:)**2)/2
 
       g%hstag(1,:) = av%cp * bcs%tstag
 

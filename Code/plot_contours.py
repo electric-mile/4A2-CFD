@@ -57,33 +57,33 @@ def main():
     colnames = ['Static pressure coefficient', 'Mach number', 'Pstag coefficient']
 
     # Plot the calculated non-dimensional parameters to show the flow solution
-    # for n,name in enumerate(fieldnames):
+    for n,name in enumerate(fieldnames):
 
-    #     # Open figure window
-    #     fig = plt.figure(figsize=[9.6,7.2]); ax = plt.axes();
+        # Open figure window
+        fig = plt.figure(figsize=[9.6,7.2]); ax = plt.axes();
     
-    #     # Set aspect ratio as equal and remove axes labels
-    #     ax.set_aspect('equal',adjustable='box'); ax.axis('off')
+        # Set aspect ratio as equal and remove axes labels
+        ax.set_aspect('equal',adjustable='box'); ax.axis('off')
  
-    #     # Plot filled contour levels
-    #     hc = ax.pcolormesh(g['x'],g['y'],g[name],shading='gouraud')
+        # Plot filled contour levels
+        hc = ax.pcolormesh(g['x'],g['y'],g[name],shading='gouraud')
 
-    #     # Add colorbar with variable name
-    #     colorbar(hc,colnames[n])
+        # Add colorbar with variable name
+        colorbar(hc,colnames[n])
 
-    #     # Add Mach = 1 contours
-    #     if name == 'mach':
-    #         ax.contour(g['x'],g['y'],g['mach'],np.linspace(-1.0,1.0,40),colors='w',
-    #             linewidths=0.5)
-    #     if name == 'pstag_coeff':
-    #         ax.contour(g['x'],g['y'],g['pstag_coeff'],np.linspace(-1.0,1.0,40),colors='w',
-    #             linewidths=0.5)
+        # Add Mach = 1 contours
+        if name == 'mach':
+            ax.contour(g['x'],g['y'],g['mach'],np.linspace(-1.0,1.0,40),colors='w',
+                linewidths=0.5)
+        if name == 'pstag_coeff':
+            ax.contour(g['x'],g['y'],g['pstag_coeff'],np.linspace(-1.0,1.0,40),colors='w',
+                linewidths=0.5)
 
-    #     # Draw the walls of the block
-    #     plot_wall(ax,g)
+        # Draw the walls of the block
+        plot_wall(ax,g)
 
-    # # Show all the plots
-    # plt.show()
+    # Show all the plots
+    plt.show()
 
     
 main()
