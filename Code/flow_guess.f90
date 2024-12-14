@@ -1,4 +1,3 @@
-      
       subroutine flow_guess(av,g,bcs,guesstype)
 
       use types
@@ -9,9 +8,7 @@
       type(t_bconds), intent(in) :: bcs
       integer, intent(in) :: guesstype
       integer :: i, j, ni, nj, j_mid
-
       real :: t_out, v_out, ro_out, lx, ly, l
-
       real :: l_i(g%ni), v_guess(g%ni), ro_guess(g%ni)
       real :: t_static(g%ni), t_lim, mach, p_static(g%ni), t_guess(g%ni), mach_guess(g%ni)
       real :: l_tot, m_f_r, a_vel, mach_lim
@@ -45,11 +42,10 @@
             write(6,*)
 
       else if(guesstype == 2) then 
-
             l_i = sum(hypot(g%lx_i, g%ly_i), 2)
+            m_f_r = ro_out * v_out * l_i(ni)
 
             if (av%casename == 'bump') then
-                  m_f_r = ro_out * v_out * l_i(ni)
                   mach_lim = 1.00
                   t_lim = bcs%tstag / (1.0 + (av%gam - 1.0)/2.0 * (mach_lim**2.0))
                   v_guess = v_out
@@ -58,11 +54,18 @@
                   v_guess = m_f_r/(ro_guess*l_i)
 
             else
-                    m_f_r = ro_out * v_out * l_i(ni)
-                    mach_lim = 3.0
-                    ro_guess = ro_out
-                    v_guess = v_out
-                    t_static = t_out
+                  mach_lim = 3.0
+                  ro_guess = ro_out
+                  v_guess = v_out
+                  t_static = t_out
+
+                  ! mach_lim = 3.00
+                  ! t_lim = bcs%tstag / (1.0 + (av%gam - 1.0)/2.0 * (mach_lim**2.0))
+                  ! v_guess = v_out
+                  ! t_static = max(t_lim, bcs%tstag - (v_guess**2)/(2.0*av%cp))
+                  ! ro_guess = (bcs%pstag * (t_static/bcs%tstag) ** (1.0/av%fgam))/(av%rgas * t_static)
+                  ! v_guess = m_f_r/(ro_guess*l_i)
+
             endif
 
             do i = 1, ni-1
@@ -74,8 +77,7 @@
                         g%ro(i, j) = ro_guess(i)
                         g%rovx(i,j) = g%ro(i, j) * v_guess(i) * ly / l
                         g%rovy(i,j) = -g%ro(i, j) * v_guess(i) * lx / l
-
-			      g%roe(i, j) = g%ro(i,j)*(0.50*(v_guess(i)**2.0) + (av%cv * t_static(i)))
+                        g%roe(i, j) = g%ro(i,j)*(0.50*(v_guess(i)**2.0) + (av%cv * t_static(i)))
                         if (g%ro(i,j) <0.0) then
                               write(6,*) 'Negative density at position (', i, ',', j, '): ro =', g%ro(i,j)
                               stop
@@ -101,5 +103,3 @@
       av%rov_ref = max(sum(g%rovx(1,:)),sum(g%rovy(1,:))) / nj
 
       end subroutine flow_guess
-
-

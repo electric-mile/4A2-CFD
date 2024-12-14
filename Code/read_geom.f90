@@ -11,7 +11,7 @@
       
 !     Declare an integer to count the number of points in the curve as you loop
 !     INSERT
-	integer :: i
+	integer :: i, j
 
 !     Open the file and assign to unit 1
       open(1,file='geom_' // av%casename // '.txt')
@@ -33,8 +33,8 @@
 !     INSERT
 	read(1,*) geom%ni_b
 	allocate(geom%x_b(geom%ni_b), geom%y_b(geom%ni_b))
-	do i = 1, geom%ni_b
-		read(1,*) geom%x_b(i), geom%y_b(i)
+	do j = 1, geom%ni_b
+		read(1,*) geom%x_b(j), geom%y_b(j)
 	end do
 
 !     Print the lengths of the curves that have been successfully read
