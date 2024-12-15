@@ -50,11 +50,15 @@ def main():
     plt.show()
     plt.plot(np.linspace(1,g['ni'],g['ni']),mass_ratio/mass_ratio[0])
     plt.show()
-        
+    print("gamma ", av['gam'])
+    print("rgas ", av['rgas'])
+    print("cv ", av['cv'])
+    for i in range(g['ni']):
+        print("mach at ", i, " ", g['mach'][i][:])
 
     # Specify the parameters to plot
-    fieldnames = ['cp', 'mach', 'pstag_coeff']
-    colnames = ['Static pressure coefficient', 'Mach number', 'Pstag coefficient']
+    fieldnames = ['mach', 'roe', 'ro']
+    colnames = ['Mach number', 'Roe number', 'density']
 
     # Plot the calculated non-dimensional parameters to show the flow solution
     for n,name in enumerate(fieldnames):

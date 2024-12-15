@@ -25,7 +25,8 @@
       dcell_temp = dcell
 
       dcell(1:ni-1,1:nj-1) = (flux_i(1:ni-1,:) - flux_i(2:ni,:) + flux_j(:,1:nj-1) - flux_j(:,2:nj)) * (av%dt/area) 
-      
+
+
       dcell = (1.0 + av%facsec) * dcell - av%facsec * dcell_temp
 
       dnode(2:ni-1,2:nj-1) = (dcell(1:ni-2, 1:nj-2) + dcell(2:ni-1,2:nj-1) + dcell(2:ni-1,1:nj-2) + dcell(1:ni-2, 2:nj-1))/4
@@ -44,7 +45,7 @@
       dnode(ni, nj) = dcell(ni-1, nj-1)
       prop = start + dnode
 
-      dcell(1:ni-1,1:nj-1) = (flux_i(1:ni-1,:) - flux_i(2:ni,:) + flux_j(:,1:nj-1) - flux_j(:,2:nj))*(av%dt_total/area)
+      dcell(1:ni-1,1:nj-1) = (flux_i(1:ni-1,:) - flux_i(2:ni,:) + flux_j(:,1:nj-1) - flux_j(:,2:nj))*(av%dt/area)
 
       if (any(isnan(prop))) then
             write(6,*) 'Error: NaN values detected in the prop array after updating.'

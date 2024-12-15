@@ -24,8 +24,9 @@ def calc_secondary(av,b):
     # INSERT
     b['vy'] = b['rovy'] / b['ro']
     b['vx'] = b['rovx'] / b['ro'] 
-    b['v'] = (b['vx']**2 + b['vy']**2)**0.5
-    b['t'] = (b['roe'] - 0.5 * b['ro'] * (b['v']**2)) / (b['ro'] * av['cv'])
+    b['v'] = (b['vx']**2 + b['vy']**2)**0.5 # This looks about right
+    b['t'] = (b['roe'] - 0.5 * b['ro'] * (b['v']**2)) / (b['ro'] * av['cv']) # All good now
+    
     b['p'] = b['ro'] * b['t'] * av['rgas']
     b['hstag'] = b['roe'] + (b['p'] / b['ro'])
     #b['tstag'] = (0.5 * (b['v']**2) + b['t']) / av['cv']
@@ -567,9 +568,13 @@ def read_settings(filename):
     av['casename'] = f.readline()
 
     # Read two gas constants and calculate the rest
-    av['gam'],av['rgas'] = [float(x) for x in f.readline().split()]
+    av['rgas'],av['gam'] = [float(x) for x in f.readline().split()]
     av['cp'] = av['rgas'] * av['gam'] / (av['gam'] - 1.0)
     av['cv'] = av['cp'] / av['gam']
+    print("RS gamma:", av['gam'])
+    print("RS rgas:", av['rgas'])
+    print("RS cp:", av['cp'])
+    print("RS cv:", av['cv'])
 
     # Read the CFL, smoothing factor and convergence limit
     av['cfl'],av['sfac'],av['d_max'] = [float(x) for x in f.readline().split()]

@@ -68,6 +68,9 @@
 
             endif
 
+            write(6,*) 'Inlet velocity is:', v_guess(1),'m/s'
+            write(6,*) 'Inlet Mach No:', v_guess(1)/(sqrt(av%gam*av%rgas*T_static(1)))
+
             do i = 1, ni-1
 
                   do j = 1, nj
@@ -97,6 +100,12 @@
                 g%roe(1,1), 'rovx =', g%rovx(1,1), 'rovy =', g%rovy(1,1)
             write(6,*)
       end if
+
+      mach_guess = v_guess / sqrt(av%gam * av%rgas * t_static)
+      write(6,*) 'Mach number array:'
+      do i = 1, ni
+            write(6,*) '  i =', i, 'Mach =', mach_guess(i)
+      end do
 
       av%ro_ref = sum(g%ro(1,:)) / nj
       av%roe_ref = sum(g%roe(1,:)) / nj

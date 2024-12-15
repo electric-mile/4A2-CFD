@@ -28,8 +28,8 @@ else
 end if
 write(3,'(i13,8e15.6)') av%nstep, dro_avg, droe_avg, drovx_avg, &
       drovy_avg, dro_max, droe_max, drovx_max, drovy_max
-write(6,*) 'Time step number ', av%nstep
+! write(6,*) 'Time step number ', av%nstep
 fmt_step = '(a,e10.3,a,i4,a,i4,a,e10.3)'
-write(*,fmt_step) '   d_max =', d_max, ' at i =', ij_max(1), ', j =', &
-      ij_max(2), ', d_avg =', d_avg
+!write(*,fmt_step) '   d_max =', d_max, ' at i =', ij_max(1), ', j =', &
+!      ij_max(2), ', d_avg =', d_avg
 end subroutine check_conv

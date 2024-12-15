@@ -30,7 +30,8 @@ def main():
     # Plot the primary flow variables to show the guess
     fieldnames = ['ro','roe','rovx','rovy']
     for n,name in enumerate(fieldnames):
- 
+        if name == 'ro':
+            hc = ax[n].pcolormesh(g['x'],g['y'],g[name]/1.22,shading='gouraud')
         # Plot filled contour levels
         hc = ax[n].pcolormesh(g['x'],g['y'],g[name],shading='gouraud')
 
