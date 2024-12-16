@@ -2,22 +2,32 @@
       use types
       implicit none
       contains
-
-
-      subroutine sum_fluxes(av,flux_i,flux_j,area,start,prop,dcell, g)
-
+      subroutine sum_fluxes(av,flux_i,flux_j,area,start,prop,dcell)
+      !write(6,*) "sum_fluxes"
       type(t_appvars), intent(in) :: av
       
       real, intent(inout) :: flux_i(:,:), flux_j(:,:), area(:,:)
       real, intent(inout) :: prop(:,:)
       real, intent(inout) :: start(:,:)
       real, intent(inout) :: dcell(:,:)
-      type(t_grid), intent(inout) :: g
-      real, dimension(size(prop,1),size(prop,2)) :: dnode
-      real, dimension(size(dcell,1),size(dcell,2)) :: dcell_temp
+      !real, dimension(size(prop,1),size(prop,2)) :: dnode
+      !real, dimension(size(dcell,1),size(dcell,2)) :: dcell_temp
+      real, allocatable :: dcell_temp(:,:), dnode(:,:)
+      
+
       integer :: ni, nj, i, j
-      ni = size(prop,1)
-      nj = size(prop,2)
+      ni = av%ni
+      nj = av%nj
+      !write(6,*) "hi"
+
+      allocate(dcell_temp(ni, nj))
+      allocate(dnode(size(prop, 1), size(prop, 2)))
+
+      ! Debugging statements
+      !write(6,*) "sum_fluxes: ni =", ni, ", nj =", nj
+      !write(6,*) "dcell size", size(dcell,1), size(dcell,2)
+      !write(6,*) "dcell_temp size", size(dcell_temp,1), size(dcell_temp,2)
+
 
       if (any(area <= 0.0)) then
             write(6,*) 'Flux Stencil: Error: Cell area must be positive and non-zero.'
@@ -27,8 +37,6 @@
 
 
       dcell(1:ni-1,1:nj-1) = (flux_i(1:ni-1,:) - flux_i(2:ni,:) + flux_j(:,1:nj-1) - flux_j(:,2:nj)) * (av%dt/area)
-
-      ! call compute_dcell_cubic(dcell, flux_i, flux_j, area, av%dt, ni, nj, g)
 
       dcell = (1.0 + av%facsec) * dcell - av%facsec * dcell_temp
 
@@ -57,6 +65,13 @@
       if (any(isnan(prop))) then
             write(6,*) 'Error: NaN values detected in the prop array after updating.'
             !stop
+      end if
+      if (allocated(dcell_temp)) then
+            deallocate(dcell_temp)
+      end if
+        
+      if (allocated(dnode)) then
+            deallocate(dnode)
       end if
       end subroutine sum_fluxes
       
@@ -97,5 +112,38 @@
                   prop_j(i, nj) = 0.5 * (3.0 * prop(i, nj) - 4.0 * prop(i, nj - 1) + prop(i, nj - 2))
             end do
       end subroutine fourth_order_accuracy
+
+      subroutine fourth_order_flux(g,p_var,pi_var_out,pj_var_out) ! Friends code, doesnt work with mine
+
+            use types
+            implicit none
+            type(t_grid), intent(inout) :: g
+            real, intent(in) :: p_var(:,:)
+            real, intent(out) :: pi_var_out(:,:), pj_var_out(:,:)
+            real :: a1,a2,a3,a4
+            integer :: i, j, ni, nj
+        
+            ni = g%ni; nj = g%nj
+        
+            a1 = -1.0/24.0
+            a2 = 13.0/24.0
+            a3 = 13.0/24.0
+            a4 = -1.0/24.0
+        
+        
+            do j = 2, nj-2
+                pi_var_out(:,j) = a1*p_var(:,j-1)+a2*p_var(:,j)+a3*p_var(:,j+1)+a4*p_var(:,j+2)
+        
+            enddo
+            do i = 2, ni-2
+                pj_var_out(i,:) = a1*p_var(i-1,:)+a2*p_var(i,:)+a3*p_var(i+1,:)+a4*p_var(i+2,:)
+        
+            enddo
+        
+            pi_var_out(:,[1,nj-1]) = 3.0*p_var(:,[1,nj-1]) -3.0*p_var(:,[2,nj-2]) + p_var(:,[3,nj-3])
+            pj_var_out([1,ni-1],:) = 3.0*p_var([1,ni-1],:) -3.0*p_var([2,ni-2],:) + p_var([3,ni-3],:)
+        
+        
+            end subroutine fourth_order_flux
 
       end module flux_stencil

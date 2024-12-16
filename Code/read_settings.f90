@@ -7,7 +7,7 @@
                   character(len=80) :: tempname
                   read(5,*) tempname
                   av%casename = trim(tempname)
-                  read(5,*) av%rgas, av%gam
+                  read(5,*) av%gam, av%rgas
                   read(5,*) av%cfl, av%sfac, av%d_max
                   read(5,*) av%nsteps
                   read(5,*) av%ni,av%nj

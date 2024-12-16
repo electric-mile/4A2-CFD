@@ -568,7 +568,7 @@ def read_settings(filename):
     av['casename'] = f.readline()
 
     # Read two gas constants and calculate the rest
-    av['rgas'],av['gam'] = [float(x) for x in f.readline().split()]
+    av['gam'],av['rgas'] = [float(x) for x in f.readline().split()]
     av['cp'] = av['rgas'] * av['gam'] / (av['gam'] - 1.0)
     av['cv'] = av['cp'] / av['gam']
     print("RS gamma:", av['gam'])

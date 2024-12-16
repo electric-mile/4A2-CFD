@@ -37,6 +37,12 @@
       if (av%casename == 'waves') then
             g%p(1,:) = bcs%p_out
       end if
+      if (av%casename == 'bump' .or. av%casename == 'bend') then
+            g%p(1,:) = bcs%ro * t_in(:) * av%rgas
+            g%p(g%ni,:) = bcs%p_out
+            g%hstag(1,:) = av%cp * bcs%tstag
+      end if
+
       ! v_in(:) = sqrt(2*av%cp*(bcs%tstag-t_in(:)))
       g%vx(1,:) = v_in(:) * cos(bcs%alpha)
       g%rovx(1,:) = bcs%ro * g%vx(1,:)

@@ -48,7 +48,14 @@
             if (av%casename == 'bump') then
                   mach_lim = 1.00
                   t_lim = bcs%tstag / (1.0 + (av%gam - 1.0)/2.0 * (mach_lim**2.0))
-                  v_guess = v_out
+                  v_guess = m_f_r/(ro_out*l_i)
+                  t_static = max(t_lim, bcs%tstag - (v_guess**2)/(2.0*av%cp))
+                  ro_guess = (bcs%pstag * (t_static/bcs%tstag) ** (1.0/av%fgam))/(av%rgas * t_static)
+                  v_guess = m_f_r/(ro_guess*l_i)
+            else if (av%casename == 'bend') then
+                  mach_lim = 1.5
+                  t_lim = bcs%tstag / (1.0 + (av%gam - 1.0)/2.0 * (mach_lim**2.0))
+                  v_guess = m_f_r/(ro_out*l_i)
                   t_static = max(t_lim, bcs%tstag - (v_guess**2)/(2.0*av%cp))
                   ro_guess = (bcs%pstag * (t_static/bcs%tstag) ** (1.0/av%fgam))/(av%rgas * t_static)
                   v_guess = m_f_r/(ro_guess*l_i)
