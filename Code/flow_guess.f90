@@ -59,6 +59,14 @@
                   t_static = max(t_lim, bcs%tstag - (v_guess**2)/(2.0*av%cp))
                   ro_guess = (bcs%pstag * (t_static/bcs%tstag) ** (1.0/av%fgam))/(av%rgas * t_static)
                   v_guess = m_f_r/(ro_guess*l_i)
+            else if (av%casename == 'tube') then
+                  ro_guess(1:(ni+1)/2) = 1.0
+                  t_static(1:(ni+1)/2) = (bcs%tstag * (1.0/bcs%pstag)**av%fgam)
+                  v_guess = 0
+                  ro_guess(ni/2+1:ni) = 0.125
+                  t_static(ni/2+1:ni) = (bcs%tstag * (0.1/bcs%pstag)**av%fgam)
+
+
 
             else
                   mach_lim = 3.0

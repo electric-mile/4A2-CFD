@@ -17,7 +17,7 @@ real :: dx_i, dy_j
 
 ni = g%ni; nj = g%nj
 ! Debugging statements
-print *, "euler_iteration: ni =", ni, ", nj =", nj
+!print *, "euler_iteration: ni =", ni, ", nj =", nj
 
 if (ni <= 0 .or. nj <= 0) then
       write(6,*) 'Euler Iteration Error: Grid dimensions must be positive and non-zero.'

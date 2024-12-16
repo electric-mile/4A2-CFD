@@ -17,12 +17,12 @@
                 write(6,*) 'Set Timestep Error: g%l_min must be positive and non-zero.'
                 return
             end if
-            if (av%casename == 'bump' .or. av%casename == 'bend') then
+            if (av%casename == 'bump' .or. av%casename == 'bend') then ! very important for bend
                 av%dt_total = av%cfl * g%l_min / (2*v_max)
             else
                 av%dt_total = av%cfl * g%l_min / (20*v_max)
             end if
-            write(6,*) 'Calculated timestep: ', av%dt, &
+            write(6,*) 'Calculated timestep: ', av%dt_total, &
                        ', Stagnation speed of sound: ', astag, &
                        ', Maximum velocity: ', v_max, &
                        ', Minimum length scale: ', g%l_min

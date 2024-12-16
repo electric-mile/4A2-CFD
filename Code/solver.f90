@@ -9,6 +9,7 @@ type(t_grid) :: g
 real :: d_max = 1, d_avg = 1
 integer :: nstep, nconv = 5, ncheck = 5, i, j
 integer :: nrkut, nrkuts
+real :: time
 call read_settings(av,bcs)
 if(av%ni /= -1) then
       call allocate_arrays(av,g,bcs)
@@ -30,9 +31,22 @@ g%corr_ro = 0.0
 g%corr_roe = 0.0
 g%corr_rovx = 0.0
 g%corr_rovy = 0.0
-nrkuts = 1
+time = 0.0
+if (av%casename == 'tube') then
+      av%nsteps = int(0.2/av%dt_total)+1
+end if
+
+nrkuts = 4
 do nstep = 1, av%nsteps
       av%nstep = nstep
+      
+      if (time + av%dt_total > 0.2 .and. av%casename == 'tube') then
+            write(6,*) 'dt before:', av%dt_total
+            av%dt_total = 0.2 - time
+            write(6,*) 'dt after:', av%dt_total
+      end if
+      time = time + av%dt_total
+      !write(6,*) 'Time:', time, 'nstep:', nstep, 'dt:', av%dt_total
       g%ro_start = g%ro
       g%roe_start = g%roe
       g%rovx_start = g%rovx
