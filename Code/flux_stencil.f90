@@ -28,7 +28,6 @@
       real, intent(inout) :: dcell(:,:)
       !real, dimension(size(dcell,1),size(dcell,2)) :: dcell_temp
       real :: dcell_temp(size(dcell,1),size(dcell,2))
-      real :: facsec = 0.0
       !Set Facsec here
       ! 0.0 for original Lax method
       ! 0.5 for Adams-bashforth method, 2nd order accurate in time
@@ -62,7 +61,7 @@
       dcell = (av%dt/area)*(flux_i(1:ni-1,:) - flux_i(2:ni,:) + flux_j(:,1:nj-1) - flux_j(:,2:nj))
 
       !Crocco Method
-      dcell = (1.0 + facsec) * dcell - facsec * dcell_temp
+      dcell = (1.0 + av%facsec) * dcell - av%facsec * dcell_temp
       dcell_temp = dcell
 
 !     Now distribute the changes equally to the four corners of each cell. Each 

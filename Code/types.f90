@@ -26,6 +26,8 @@
 !         Number of blocks and matching patches for multi-block extension
           integer :: nn, nm
 
+          real :: facsec, fcorr
+
       end type t_appvars
 
 !     Boundary condition type contains inlet and outlet data

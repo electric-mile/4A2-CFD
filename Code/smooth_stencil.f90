@@ -20,7 +20,6 @@
       real, intent(inout) :: prop(:,:), corr(:,:)
       real, dimension(size(prop,1),size(prop,2)) :: prop_avg, corr_total
       integer :: ni, nj, i, j
-      real :: fcorr
 
 !     Get the block size and store locally for convenience
       ni = size(prop,1); nj = size(prop,2)
@@ -60,8 +59,8 @@
       prop_avg([1,ni],[1,nj]) = prop([1,ni],[1,nj])
 
       ! Deferred correction method
-      fcorr = 0
-      corr_total = fcorr * (prop - prop_avg)
+
+      corr_total = av%fcorr * (prop - prop_avg)
       corr = 0.99 * corr + 0.01 * corr_total
       prop = (1.0 - av%sfac) * prop + av%sfac * (prop_avg + corr) 
 

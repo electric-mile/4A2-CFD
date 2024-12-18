@@ -45,9 +45,10 @@ def main():
         tstag_ratio.append(mass_av_tstag)
         mass_ratio.append(np.sum(mass))
 
-    
+    # 
     plt.plot(np.linspace(1,g['ni'],g['ni']),tstag_ratio)
     plt.show()
+    
     plt.plot(np.linspace(1,g['ni'],g['ni']),mass_ratio/mass_ratio[0])
     plt.show()
         

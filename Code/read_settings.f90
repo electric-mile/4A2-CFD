@@ -56,6 +56,7 @@
 !     Read the outlet static pressure and store into the "bcs" datatype
 !     INSERT
       read(5,*) bcs%p_out
+      read(5,*) av%facsec, av%fcorr
 
 !     Print the settings to check they have been read, you can use this syntax
 !     anywhere else you want in the program to debug your code

@@ -96,7 +96,7 @@
 !     program, you should aim to program anything inside this loop to operate as
 !     efficiently as you can.
       ! Runge-Kutta
-      nrkuts = 2
+      nrkuts = 5
 
             do nstep = 1, av%nsteps
 
