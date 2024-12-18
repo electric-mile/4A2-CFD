@@ -440,13 +440,13 @@ call smooth_array(av,g%rovx, g%corr_rovx)
 call smooth_array(av,g%rovy, g%corr_rovy)
 
 
-!if (av%casename /= 'tube') then
-!      v = sqrt(g%rovx**2 + g%rovy**2)/g%ro
-!      t = (g%roe - 0.5 * g%ro * (v**2)) / (g%ro * av%cv)
-!      mach = v / ((av%gam * av%rgas * t)**0.5)
-!      write(6,*) 'Euler Iteration: Mach Number'
-!      write(6,*) 'roe =', g%roe(2,2),', ro =', g%ro(2,2), 'at ', av%nstep ! roe changes first
-!      write(6,*) 'mach =', minval(mach(2,:)), maxval(mach(2,:)),', velocity =', v(2,2),', tstat =', t(2,2), 'at ', av%nstep ! tstat changes first
-!end if
+if (av%casename /= 'tube') then
+      v = sqrt(g%rovx**2 + g%rovy**2)/g%ro
+      t = (g%roe - 0.5 * g%ro * (v**2)) / (g%ro * av%cv)
+      mach = v / ((av%gam * av%rgas * t)**0.5)
+      write(6,*) 'Euler Iteration: Mach Number'
+      write(6,*) 'roe =', g%roe(2,2),', ro =', g%ro(2,2), 'at ', av%nstep ! roe changes first
+      write(6,*) 'mach =', minval(mach(2,:)), maxval(mach(2,:)),', velocity =', v(2,2),', tstat =', t(2,2), 'at ', av%nstep ! tstat changes first
+end if
 end subroutine euler_iteration
 

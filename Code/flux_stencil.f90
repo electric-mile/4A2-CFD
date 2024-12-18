@@ -147,8 +147,8 @@
         
             enddo
         
-            pi_var_out(:,[1,nj-1]) = 3.0*p_var(:,[1,nj-1]) -3.0*p_var(:,[2,nj-2]) + p_var(:,[3,nj-3])
-            pj_var_out([1,ni-1],:) = 3.0*p_var([1,ni-1],:) -3.0*p_var([2,ni-2],:) + p_var([3,ni-3],:)
+            pi_var_out(:,[1,nj-1]) = (p_var(:,[1,nj-1]) +p_var(:,[2,nj-2]))/2
+            pj_var_out([1,ni-1],:) = (p_var([1,ni-1],:) +p_var([2,ni-2],:))/2
         
         
             end subroutine fourth_order_flux

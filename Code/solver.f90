@@ -41,7 +41,7 @@ if (av%casename == 'tube') then
       av%nsteps = int(0.2/av%dt_total)+1
 end if
 
-nrkuts = 3
+nrkuts = 1
 do nstep = 1, av%nsteps
       av%nstep = nstep
       
@@ -88,6 +88,7 @@ if (av%casename == 'waves') then
       x_b= 149.7
 
       do i = 1, g%ni
+            write(6,*) "x:", g%x(i,1)
             do j = 1, g%nj
                   x = g%x(i,j)
                   y = g%y(i,j)

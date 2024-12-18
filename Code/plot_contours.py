@@ -50,6 +50,9 @@ def main():
     plt.show()
     plt.plot(np.linspace(1,g['ni'],g['ni']),mass_ratio/mass_ratio[0])
     plt.show()
+    print("vx plot")
+    plt.plot(np.linspace(1,g['ni'],g['ni']),g['vx'][:,0])
+    plt.show()
     print("gamma ", av['gam'])
     print("rgas ", av['rgas'])
     print("cv ", av['cv'])
@@ -57,8 +60,8 @@ def main():
         print("mach at ", i, " ", g['mach'][i][:])
 
     # Specify the parameters to plot
-    fieldnames = ['mach', 'roe', 'ro', 'cp', 'ro']
-    colnames = ['Mach number', 'Roe number', 'density', 'static pressure coefficient', 'density']
+    fieldnames = ['mach', 'roe', 'ro', 'cp', 'ro', 'vx']
+    colnames = ['Mach number', 'Roe number', 'density', 'static pressure coefficient', 'density', 'velocity, x']
 
     # Plot the calculated non-dimensional parameters to show the flow solution
     for n,name in enumerate(fieldnames):

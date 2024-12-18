@@ -69,7 +69,8 @@
                   !       t_static(1:(ni+1)/2) = (bcs%tstag * (1.0/bcs%pstag)**av%fgam)
                   !       v_guess = 0.0
                   !       ro_guess((ni+2)/2:ni) = 0.125
-                  !       t_static((ni+2)/2:ni) = (bcs%tstag * (0.1/bcs%pstag)**av%fgam)      else
+                  !       t_static((ni+2)/2:ni) = (bcs%tstag * (0.1/bcs%pstag)**av%fgam)      
+            else
                   mach_lim = 3.0
                   ro_guess = ro_out
                   v_guess = v_out
