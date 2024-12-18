@@ -1,5 +1,5 @@
       
-      subroutine generate_mesh(geom,g)
+      subroutine generate_mesh(geom,g, av)
 
 !     Create cells of the mesh to cover the domain defined by geometry curves,
 !     the values of the node coordinates, x(i,j) and y(i,j) are stored in "g"
@@ -10,6 +10,7 @@
       implicit none
       type(t_geometry), intent(in) :: geom
       type(t_grid), intent(inout) :: g
+      type(t_appvars), intent(in) :: av
       real :: si_a(geom%ni_a), si_b(geom%ni_b), si(g%ni)
       integer :: ni, nj
 
@@ -56,7 +57,13 @@
 !     flexible way. The "wall" variable is an "ni * nj" logical array where 
 !     "true" indicates the node is on a wall.
       g%wall = .false.
-      g%wall(:,[1,g%nj]) = .true.
+      if (av%casename == 'tube') then
+            g%wall(:,[1,g%nj]) = .true.
+            g%wall([1,g%ni],:) = .true.
+      else 
+            g%wall(:,[1,g%nj]) = .true.
+      end if
+      
 
 !     Print that the mesh has been created
       write(6,*) 'Interpolated mesh from the bounding geometry curves'

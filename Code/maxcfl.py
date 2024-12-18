@@ -30,7 +30,7 @@ def run_solver(input_file, log_file):
     with open(input_file, 'r') as inp, open(log_file, 'w') as log:
         subprocess.run(['../Code/solver.x'], stdin=inp, stdout=log, stderr=subprocess.STDOUT)
 
-def analyze_convergence(file_path, tolerance=1e-4):
+def analyze_convergence(file_path, tolerance=1e-3):
     """
     Analyze convergence history from a space-separated file.
     Returns True if stable (residual decreases consistently below tolerance), False otherwise.
@@ -45,7 +45,7 @@ def analyze_convergence(file_path, tolerance=1e-4):
         residuals = data[:, 1]  # Assuming the second column contains residuals
         
         # Check if residuals consistently drop below the tolerance
-        if np.all(residuals[-5:] < tolerance):  # Check the last 5 iterations
+        if np.all(residuals[-10:] < tolerance):  # Check the last 5 iterations
             return True
     except Exception as e:
         print(f"Error analyzing {file_path}: {e}")

@@ -9,14 +9,14 @@
       integer, intent(in) :: guesstype
       integer :: i, j, ni, nj, j_mid
       real :: t_out, v_out, ro_out, lx, ly, l
-      real :: l_i(g%ni), v_guess(g%ni), ro_guess(g%ni)
+      real :: l_i(g%ni), v_guess(g%ni), ro_guess(g%ni), l_temp(g%nj)
       real :: t_static(g%ni), t_lim, mach, p_static(g%ni), t_guess(g%ni), mach_guess(g%ni)
       real :: l_tot, m_f_r, a_vel, mach_lim
 
       ni = g%ni
       nj = g%nj
 
-      t_out = bcs%tstag * (bcs%p_out / bcs%pstag)**av%fgam
+      t_out = (bcs%tstag * (bcs%p_out / bcs%pstag)**av%fgam) 
       v_out = (2 * av%cp * (bcs%tstag - t_out))**0.5
       ro_out = bcs%p_out / (av%rgas * t_out)
 
@@ -42,7 +42,12 @@
             write(6,*)
 
       else if(guesstype == 2) then 
-            l_i = sum(hypot(g%lx_i, g%ly_i), 2)
+            do i = 1 , ni
+                  do j = 1, nj - 1
+                        l_temp(j) = hypot(g%lx_i(i,j), g%ly_i(i,j))
+                  end do
+                  l_i(i) = sum(l_temp)  
+            end do
             m_f_r = ro_out * v_out * l_i(ni)
 
             if (av%casename == 'bump') then
@@ -53,74 +58,48 @@
                   ro_guess = (bcs%pstag * (t_static/bcs%tstag) ** (1.0/av%fgam))/(av%rgas * t_static)
                   v_guess = m_f_r/(ro_guess*l_i)
             else if (av%casename == 'bend') then
-                  mach_lim = 1.5
+                  mach_lim = 1.0
                   t_lim = bcs%tstag / (1.0 + (av%gam - 1.0)/2.0 * (mach_lim**2.0))
                   v_guess = m_f_r/(ro_out*l_i)
                   t_static = max(t_lim, bcs%tstag - (v_guess**2)/(2.0*av%cp))
                   ro_guess = (bcs%pstag * (t_static/bcs%tstag) ** (1.0/av%fgam))/(av%rgas * t_static)
                   v_guess = m_f_r/(ro_guess*l_i)
-            else if (av%casename == 'tube') then
-                  ro_guess(1:(ni+1)/2) = 1.0
-                  t_static(1:(ni+1)/2) = (bcs%tstag * (1.0/bcs%pstag)**av%fgam)
-                  v_guess = 0
-                  ro_guess(ni/2+1:ni) = 0.125
-                  t_static(ni/2+1:ni) = (bcs%tstag * (0.1/bcs%pstag)**av%fgam)
-
-
-
-            else
+                  ! else if (av%casename == 'tube') then
+                  !       ro_guess(1:(ni+1)/2) = 1.0
+                  !       t_static(1:(ni+1)/2) = (bcs%tstag * (1.0/bcs%pstag)**av%fgam)
+                  !       v_guess = 0.0
+                  !       ro_guess((ni+2)/2:ni) = 0.125
+                  !       t_static((ni+2)/2:ni) = (bcs%tstag * (0.1/bcs%pstag)**av%fgam)      else
                   mach_lim = 3.0
                   ro_guess = ro_out
                   v_guess = v_out
                   t_static = t_out
-
-                  ! mach_lim = 3.00
-                  ! t_lim = bcs%tstag / (1.0 + (av%gam - 1.0)/2.0 * (mach_lim**2.0))
-                  ! v_guess = v_out
-                  ! t_static = max(t_lim, bcs%tstag - (v_guess**2)/(2.0*av%cp))
-                  ! ro_guess = (bcs%pstag * (t_static/bcs%tstag) ** (1.0/av%fgam))/(av%rgas * t_static)
-                  ! v_guess = m_f_r/(ro_guess*l_i)
-
             endif
 
             write(6,*) 'Inlet velocity is:', v_guess(1),'m/s'
             write(6,*) 'Inlet Mach No:', v_guess(1)/(sqrt(av%gam*av%rgas*T_static(1)))
 
-            do i = 1, ni-1
-
-                  do j = 1, nj
-                        lx = g%lx_j(i,j)
-                        ly = g%ly_j(i,j)
+            do i = 1, ni -1 
+                  do j = 1, nj  
+                        lx = g%lx_j(i,j); ly = g%ly_j(i,j); 
                         l = hypot(lx,ly)
-                        g%ro(i, j) = ro_guess(i)
-                        g%rovx(i,j) = g%ro(i, j) * v_guess(i) * ly / l
-                        g%rovy(i,j) = -g%ro(i, j) * v_guess(i) * lx / l
-                        g%roe(i, j) = g%ro(i,j)*(0.50*(v_guess(i)**2.0) + (av%cv * t_static(i)))
-                        if (g%ro(i,j) <0.0) then
-                              write(6,*) 'Negative density at position (', i, ',', j, '): ro =', g%ro(i,j)
-                              stop
-                        end if
+                        g%ro(i,j) = ro_guess(i)
+                        g%rovx(i,j) = g%ro(i,j) * v_guess(i) * (ly / l)
+                        g%rovy(i,j) = -g%ro(i,j) * v_guess(i) * (lx/ l)
+                        g%roe(i,j) =  ro_guess(i) * (((v_guess(i)**2)/2.0) + (av%cv * t_static(i)))
                   end do
             end do
 
-            do j = 1, nj
-                  g%rovx(ni, j) = g%rovx(ni-1,j)
-                  g%rovy(ni, j) = g%rovy(ni-1,j)
-                  g%roe (ni, j) = g%roe (ni-1,j)
-                  g%ro (ni, j) = g%ro (ni-1,j)
-            end do
+            g%ro(ni,:) = g%ro(ni-1,:)
+            g%roe(ni,:) = g%roe(ni-1,:)
+            g%rovx(ni,:) = g%rovx(ni-1,:)
+            g%rovy(ni,:) = g%rovy(ni-1,:)
 
             write(6,*) 'Flow Guess: Improved flow guess calculated'
             write(6,*) '  At first point ro =', g%ro(1,1), 'roe =', &
                 g%roe(1,1), 'rovx =', g%rovx(1,1), 'rovy =', g%rovy(1,1)
             write(6,*)
       end if
-
-      mach_guess = v_guess / sqrt(av%gam * av%rgas * t_static)
-      write(6,*) 'Mach number array:'
-      do i = 1, ni
-            write(6,*) '  i =', i, 'Mach =', mach_guess(i)
-      end do
 
       av%ro_ref = sum(g%ro(1,:)) / nj
       av%roe_ref = sum(g%roe(1,:)) / nj

@@ -57,8 +57,8 @@ def main():
         print("mach at ", i, " ", g['mach'][i][:])
 
     # Specify the parameters to plot
-    fieldnames = ['mach', 'roe', 'ro', 'cp']
-    colnames = ['Mach number', 'Roe number', 'density', 'static pressure coefficient']
+    fieldnames = ['mach', 'roe', 'ro', 'cp', 'ro']
+    colnames = ['Mach number', 'Roe number', 'density', 'static pressure coefficient', 'density']
 
     # Plot the calculated non-dimensional parameters to show the flow solution
     for n,name in enumerate(fieldnames):

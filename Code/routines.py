@@ -35,7 +35,7 @@ def calc_secondary(av,b):
     b['mach'] = b['v'] / ((av['gam'] * av['rgas'] * b['t'])**0.5)
     b['tstag'] = (b['t'] * (1+((av['gam']-1)/2)*b['mach']**2))
     b['tstag_ratio'] = b['tstag'] / b['tstag'][0,:]
-    
+
     
     return b
 

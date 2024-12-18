@@ -26,6 +26,8 @@ module types
                 integer :: nn, nm
       
                 real :: facsec, fcorr
+
+                integer :: order
       
             end type t_appvars
       
